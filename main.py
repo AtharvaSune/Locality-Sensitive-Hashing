@@ -1,12 +1,10 @@
 import argparse
-from shingle import Shingling
+from MinHash import main
 
 
-def main(path, train=True):
-    shingles = Shingling()
-    shingles.k_shingles(shingles.create_dict_key(), train)
-    shingles.print()
+def main1(path, train=True):
+    main(path, train)
 
 
 if __name__ == "__main__":
-    main()
+    main1("/home/atharva/Desktop/Developement/LSH/corpus-20090418/*")

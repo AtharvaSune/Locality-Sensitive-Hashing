@@ -34,7 +34,10 @@ class Shingling():
                     else:
                         self.train_data[key] = []
                         self.train_data[key].append(corpus_key[file])
-        return list(a)
+        if train:
+            return len(list(a)), self.train_data
+        else:
+            return list(a)
 
     def create_dict_key(self):
         corpus_key = {}
