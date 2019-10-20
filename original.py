@@ -7,4 +7,4 @@ def main1(path, train=True):
 
 
 if __name__ == "__main__":
-    main1("/home/atharva/Desktop/Developement/LSH/corpus-20090418/*")
+    main1("/home/atharva/Desktop/Developement/LSH/corpus-20090418/org/*")

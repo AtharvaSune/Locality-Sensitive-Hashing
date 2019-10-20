@@ -1,6 +1,6 @@
 import random
 import math
-from shingle import Shingling
+from Shingle import Shingling
 
 
 class MinHash():
@@ -103,10 +103,11 @@ def main(path, train):
     shingles = Shingling(path)
     num_shingles, shingle_dict = shingles.k_shingles(
         shingles.create_dict_key(), train)
-    shingles.print()
-    min_H = MinHash(shingle_dict, num_shingles, 100)
+    print(num_shingles)
+    dataset_size = shingles.print()
+    min_H = MinHash(shingle_dict, num_shingles, dataset_size)
     f = open("/home/atharva/Desktop/Developement/LSH/sig_mat.txt", 'w')
-    sig_m = min_H.signature_matrix(100)
+    sig_m = min_H.signature_matrix(dataset_size)
     for i in sig_m:
         f.write(str(i))
         f.write("\n")

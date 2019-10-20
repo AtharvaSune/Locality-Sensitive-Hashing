@@ -5,15 +5,18 @@ import os
 class Shingling():
     def __init__(self, path, shingle_size=10):
         self.path = path[:-1]
+        print(path)
         self.corpus = self.get_files(path)
         self.shingle_size = shingle_size
         self.train_data = {}
 
     def get_files(self, path):
         files = glob.glob(path)
+        print(files)
         temp = []
         for file in files:
             temp.append(os.path.split(file)[1])
+        print(temp)
         return temp
 
     def k_shingles(self, corpus_key, train=True):
@@ -54,6 +57,7 @@ class Shingling():
             f.write("{}:{}\n".format(key, self.train_data[key]))
         f.close()
         print("Shingle Dictionary Created")
+        return len(self.corpus)
 
 
 if __name__ == "__main__":
