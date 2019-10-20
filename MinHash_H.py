@@ -4,7 +4,7 @@ from Shingle import Shingling
 
 random.seed(1)
 
-class MinHash():
+class MinHashH():
 
     def __init__(self, shingle_dict, num_shingles, num_hashes):
         """
@@ -58,22 +58,3 @@ class MinHash():
         for i in range(self.num_hashes):
             sm.append(sdm[temp[i]])
         return sm
-
-
-def main(path, train):
-    shingles = Shingling(path)
-    num_shingles, shingle_dict = shingles.k_shingles(
-        shingles.create_dict_key(), train)
-    print(num_shingles)
-    dataset_size = shingles.print()
-    min_H = MinHash(shingle_dict, num_shingles, dataset_size)
-    f = open("/home/atharva/Desktop/Developement/LSH/sig_mat.txt", 'w')
-    sig_m = min_H.signature_matrix(dataset_size)
-    for i in sig_m:
-        f.write(str(i))
-        f.write("\n")
-    f.close()
-
-
-if __name__ == "__main__":
-    main("/home/atharva/Desktop/Developement/LSH/corpus-20090418/org/*", True)

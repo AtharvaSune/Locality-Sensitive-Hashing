@@ -3,7 +3,7 @@ import math
 import pickle
 
 
-class MinHash():
+class MinHashC():
 
     def __init__(self, shingle_dict, num_shingles, num_hashes):
         """

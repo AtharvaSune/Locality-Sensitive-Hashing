@@ -4,7 +4,7 @@ import pickle
 from shingle import Shingling
 
 
-class MinHash():
+class MinHashJ():
 
     def __init__(self, shingle_dict, num_shingles, num_hashes):
         """
