@@ -1,4 +1,5 @@
 import random
+import pickle
 
 
 class LSH:
@@ -31,6 +32,21 @@ class LSH:
             This function will return a dictionary where key = coeff a, b 
             and the value is a list of size num_hashes
         """
+
+        flag = 1
+
+        persistant_coeff = {}
+
+        try:
+            with open('lsh_hash_functions', 'rb') as infile:
+                persistant_coeff = pickle.load(infile)
+
+        except EnvironmentError:
+            flag = 0
+
+        if(flag == 1):
+            return persistant_coeff
+
         coeff = {
             'a': [],
             'b': [],
@@ -50,6 +66,13 @@ class LSH:
             while rand in coeff['b']:
                 rand = random.randint(1, 100)
             coeff['b'].append(rand)
+
+        try:
+            with open('lsh_hash_functions', 'wb') as outfile:
+                pickle.dump(coeff, outfile)
+
+        except EnvironmentError:
+            flag = 0
 
         return coeff
 
@@ -98,8 +121,8 @@ class LSH:
                     v.append(self.M[i][j][k])
 
                 band_condensed.append(int("".join(map(str, v))))
-
-                print(v)
+                
+                
         hash_functions = self.create_hash_functions()
         print(hash_functions)
 

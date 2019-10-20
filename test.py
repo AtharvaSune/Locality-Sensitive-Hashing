@@ -9,4 +9,4 @@ def train(path, train):
 
 
 if __name__ == "__main__":
-    train("/home/atharva/Desktop/Developement/LSH/corpus-20090418/test_d/g0pA_taska.txt*", False)
+    train("./corpus-20090418/test_d/g0pA_taska.txt*", False)
