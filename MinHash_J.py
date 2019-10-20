@@ -1,6 +1,7 @@
 import random
 import math
-from Shingle import Shingling
+import pickle
+from shingle import Shingling
 
 
 class MinHash():
@@ -29,6 +30,20 @@ class MinHash():
             This function will return a dictionary where key = coeff a, b 
             and the value is a list of size num_hashes
         """
+        flag = 1
+
+        persistant_coeff = {}
+
+        try:
+            with open('min_hashj_functions', 'rb') as infile:
+                persistant_coeff = pickle.load(infile)
+
+        except EnvironmentError:
+            flag = 0
+
+        if(flag == 1):
+            return persistant_coeff
+
         coeff = {
             'a': [],
             'b': [],
@@ -48,6 +63,13 @@ class MinHash():
             while rand in coeff['b']:
                 rand = random.randint(1, self.num_shingles)
             coeff['b'].append(rand)
+
+        try:
+            with open('min_hash_functions', 'wb') as outfile:
+                pickle.dump(coeff, outfile)
+
+        except EnvironmentError:
+            flag = 0
 
         return coeff
 
@@ -97,38 +119,3 @@ class MinHash():
                 for i, hash_val in enumerate(hash_value):
                     sm[i][c-1] = min(sm[i][c-1], hash_val)
         return sm
-
-
-def main(path, train):
-    shingles = Shingling(path)
-    num_shingles, shingle_dict = shingles.k_shingles(
-        shingles.create_dict_key(), train)
-    print(num_shingles)
-    dataset_size = shingles.print()
-    min_H = MinHash(shingle_dict, num_shingles, dataset_size)
-    f = open("/home/atharva/Desktop/Developement/LSH/sig_mat.txt", 'w')
-    sig_m = min_H.signature_matrix(dataset_size)
-    for i in sig_m:
-        f.write(str(i))
-        f.write("\n")
-    f.close()
-
-
-if __name__ == "__main__":
-    shingle_dict = {
-        "asdf": [1],
-        "sdfg": [2],
-        "dfg ": [1, 2],
-        "fg h": [1],
-        "g hj": [2]
-    }
-
-    dataset_size = 2
-    num_shingles = 5
-    num_hashes = 2
-
-    min_H = MinHash(shingle_dict, num_shingles, num_hashes)
-    f = open("/home/atharva/Desktop/Developement/LSH/sig_mat.txt", 'w')
-    sig_m = min_H.signature_matrix(dataset_size)
-    f.write(str(sig_m))
-    f.close()

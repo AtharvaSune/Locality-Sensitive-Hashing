@@ -51,7 +51,7 @@ class Shingling():
         return corpus_key
 
     def print(self):
-        f = open("/home/atharva/Desktop/Developement/LSH/out.txt",
+        f = open("./out.txt",
                  'w')
         for key in self.train_data.keys():
             f.write("{}:{}\n".format(key, self.train_data[key]))

@@ -1,6 +1,6 @@
 import random
 import math
-from Shingle import Shingling
+import pickle
 
 
 class MinHash():
@@ -21,6 +21,18 @@ class MinHash():
 
     def create_plane_matrix(self):
         plane = []
+
+        flag = 1
+
+        try:
+            with open('min_hashc_functions', 'rb') as infile:
+                plane = pickle.load(infile)
+        except EnvironmentError:
+            flag = 0
+
+        if(flag == 1):
+            return plane
+
         for i in range(self.num_hashes):
             temp = []
             for j in range(self.num_shingles):
@@ -29,6 +41,12 @@ class MinHash():
                     rand = random.uniform(-1, 1)
                 temp.append(rand)
             plane.append(temp)
+
+        try:
+            with open('min_hashc_functions', 'wb') as outfile:
+                pickle.dump(plane, outfile)
+        except EnvironmentError:
+            flag = 0
 
         return plane
 
@@ -77,22 +95,3 @@ class MinHash():
                     t += sdm[k][j] * plane[i][k]
                 sm[i][j] = t
         return sm
-
-
-def main(path, train):
-    shingles = Shingling(path)
-    num_shingles, shingle_dict = shingles.k_shingles(
-        shingles.create_dict_key(), train)
-    print(num_shingles)
-    dataset_size = shingles.print()
-    min_H = MinHash(shingle_dict, num_shingles, dataset_size)
-    f = open("/home/atharva/Desktop/Developement/LSH/sig_mat.txt", 'w')
-    sig_m = min_H.signature_matrix(dataset_size)
-    for i in sig_m:
-        f.write(str(i))
-        f.write("\n")
-    f.close()
-
-
-if __name__ == "__main__":
-    main("/home/atharva/Desktop/Developement/LSH/corpus-20090418/org/*", True)
