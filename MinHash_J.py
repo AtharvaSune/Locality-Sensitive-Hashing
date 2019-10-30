@@ -1,7 +1,7 @@
 import random
 import math
 import pickle
-from shingle import Shingling
+from Shingle import Shingling
 
 
 class MinHashJ():
@@ -89,7 +89,7 @@ class MinHashJ():
 
         return temp
 
-    def signature_matrix(self, dataset_size):
+    def signature_matrix(self, dataset_size, shingles_list=[], train=True):
         # Initialize the signature matrix
         sm = []
         for i in range(self.num_hashes):
@@ -101,21 +101,51 @@ class MinHashJ():
         coeff = self.create_hash_functions()
         # implement min_hashing following the psuedo code
         # in psuedo.md
+
+        sdm = []
+        for i in range(self.num_shingles):
+            t = []
+            for j in range(dataset_size):
+                t.append(0)
+            sdm.append(t)
+        if train:
+            for row in self.shingle_dict.keys():
+                for col in self.shingle_dict[row]:
+                    sdm[self.shingle_id_dict[row]-1][col-1] = 1
+        else:
+            for row in self.shingle_dict.keys():
+                if row in shingles_list:
+                    sdm[self.shingle_id_dict[row]-1][0] = 1
+
         for row in self.shingle_dict.keys():
             hash_value = []
+            if train:
+                for i in range(self.num_hashes):
+                    # calculate hash values for considered row
+                    # where hash functions are of format
+                    # h(x) = (a*x + b) % c
+                    val = (coeff['a'][i] * self.shingle_id_dict[row] +
+                           coeff['b'][i]) % coeff['c']
+                    hash_value.append(val)
+            else:
+                if row in shingles_list:
+                    for i in range(self.num_hashes):
+                        # calculate hash values for considered row
+                        # where hash functions are of format
+                        # h(x) = (a*x + b) % c
+                        val = (coeff['a'][i] * self.shingle_id_dict[row] +
+                               coeff['b'][i]) % coeff['c']
+                        hash_value.append(val)
 
-            for i in range(self.num_hashes):
-                # calculate hash values for considered row
-                # where hash functions are of format
-                # h(x) = (a*x + b) % c
-                val = (coeff['a'][i] * self.shingle_id_dict[row] +
-                       coeff['b'][i]) % coeff['c']
-                hash_value.append(val)
+            if train:
+                for c in range(dataset_size):
+                    if sdm[self.shingle_id_dict[row]-1][c] == 1:
+                        for i, hash_val in enumerate(hash_value):
+                            sm[i][c] = min(sm[i][c], hash_val)
+            else:
+                if row in shingles_list:
+                    if sdm[self.shingle_id_dict[row]-1][0] == 1:
+                        for i, hash_val in enumerate(hash_value):
+                            sm[i][0] = min(sm[i][0], hash_val)
 
-            # M(i, c) = min(M(i, c), val(i)) for given row
-            # c = column that contains the considered shingle
-            # i = ith hash function
-            for c in self.shingle_dict[row]:
-                for i, hash_val in enumerate(hash_value):
-                    sm[i][c-1] = min(sm[i][c-1], hash_val)
         return sm

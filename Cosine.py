@@ -4,47 +4,75 @@ from preprocess import preprocess
 
 class Cosine():
 
-	def __init__ (self, orginals_path, query_path):
-		self.originals_path = orginals_path
-		self.query_path = query_path
-		self.processed_originals = process_originals(originals_path, train = true)
+    def __init__(self, originals_path, query_path):
+        self.originals_path = originals_path
+        self.query_path = query_path
+        self.processed_originals = self.process_originals(
+            originals_path, train=True)
+        self.processed_query = {}
 
-	def process_originals(path, train):
-		processed_originals = {}
+    def process_originals(self, path, train):
+        processed_originals = {}
 
-		flag = 1
+        flag = 1
 
-		try:
-			with open('processed_originals_cos', 'rb') as infile:
-				processed_originals = pickle.load(infile)
-		except EnvironmentError:
-			flag = 0
+        try:
+            with open('processed_originals_cos', 'rb') as infile:
+                processed_originals = pickle.load(infile)
+        except EnvironmentError:
+            flag = 0
 
-		if(flag == 1):
-			return processed_originals
+        if(flag == 1):
+            return processed_originals
+        else:
+            op = preprocess(path, train, 'C')
+            processed_originals = op.process()
 
-	    op = preprocess(path, train, 'C')
-	    processed_originals = op.process()
+            with open('processed_originals_cos', 'wb') as outfile:
+                pickle.dump(processed_originals, outfile)
 
-	    with open('processed_originals_cos', 'wb') as outfile:
-	    	pickle.dump(processed_originals, outfile)
+            return processed_originals
 
-    	return processed_originals
+    def process_query(self, path, train):
+        processed_query = {}
+        op = preprocess(path, train, 'C')
+        processed_query = op.process()
+        return processed_query
 
+    def compare(self, original, query):
+        org_column = self.processed_originals[original]
+        query_column = self.processed_query[query]
 
-	def process_query(path, train):
-		processed_query = {}
+        similar_bands = 0
 
-		op = preprocess(path, train, 'C')
-	    processed_query = op.process()
+        for band in org_column:
+            hash_count = 0
 
-    	return processed_query
+            for hash_ind in range(0, len(org_column[band])):
+                if(org_column[band][hash_ind] == query_column[band][hash_ind]):
+                    hash_count += 1
 
+            if(hash_count >= 60):
+                similar_bands += 1
 
-	def compare(processed_originals, processed_query):
+        similar = similar_bands / 20
+        comparison = False
 
+        if (similar >= 0.6):
+            comparison = True
 
-	def similarity():
-		processed_query = process_query(self.query_path, train = true)
+        return comparison, similar
 
-		# call compare for every query doc etc. and return accordingly
+    def similarity(self):
+        self.processed_query = self.process_query(self.query_path, train=False)
+
+        res = dict()
+
+        for original in self.processed_originals:
+            res[original] = dict()
+            comparison, similar = self.compare(original, 0)
+            res[original]['comparison'] = comparison
+            res[original]['similar'] = similar
+
+        return res
+        # call compare for every query doc etc. and return accordingly

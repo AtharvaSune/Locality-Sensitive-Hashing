@@ -18,6 +18,7 @@ class MinHashC():
         self.shingle_dict = shingle_dict
         self.shingle_id_dict = self.make_shingle_dict(shingle_dict)
         self.num_shingles = num_shingles
+        # print("shingles: {}".format(self.shingle_dict))
 
     def create_plane_matrix(self):
         plane = []
@@ -66,7 +67,7 @@ class MinHashC():
 
         return temp
 
-    def signature_matrix(self, dataset_size):
+    def signature_matrix(self, dataset_size, shingles_list=[], train=True):
         # Initialize the signature matrix
         sm = []
         for i in range(self.num_hashes):
@@ -82,10 +83,14 @@ class MinHashC():
                 t.append(0)
             sdm.append(t)
 
-        for row in self.shingle_dict.keys():
-            for col in self.shingle_dict[row]:
-                sdm[self.shingle_id_dict[row]-1][col-1] = 1
-
+        if train:
+            for row in self.shingle_dict.keys():
+                for col in self.shingle_dict[row]:
+                    sdm[self.shingle_id_dict[row]-1][col-1] = 1
+        else:
+            for row in self.shingle_dict.keys():
+                if row in shingles_list:
+                    sdm[self.shingle_id_dict[row]-1][0] = 1
         # Initialize the hash function coefficients
         plane = self.create_plane_matrix()
         for i in range(self.num_hashes):
@@ -94,4 +99,8 @@ class MinHashC():
                 for k in range(self.num_shingles):
                     t += sdm[k][j] * plane[i][k]
                 sm[i][j] = t
+                if sm[i][j] > 0:
+                    sm[i][j] = 1
+                else:
+                    sm[i][j] = 0
         return sm

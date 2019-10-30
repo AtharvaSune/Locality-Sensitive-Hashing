@@ -5,24 +5,24 @@ import os
 class Shingling():
     def __init__(self, path, shingle_size=10):
         self.path = path[:-1]
-        print(path)
         self.corpus = self.get_files(path)
         self.shingle_size = shingle_size
         self.train_data = {}
 
     def get_files(self, path):
         files = glob.glob(path)
-        print(files)
         temp = []
         for file in files:
             temp.append(os.path.split(file)[1])
-        print(temp)
         return temp
 
     def k_shingles(self, corpus_key, train=True):
         a = set()
         for file in self.corpus:
-            path = self.path + file
+            if train:
+                path = self.path + file
+            else:
+                path = self.path
             f = open(path, 'r', encoding="unicode_escape").read().strip()
             f = f.replace("\n", " ")
             f = f.replace(",", "")
@@ -61,6 +61,4 @@ class Shingling():
 
 
 if __name__ == "__main__":
-    pre = Shingling("./corpus-20090418/*")
-    pre.k_shingles(pre.create_dict_key())
-    pre.print()
+    pass

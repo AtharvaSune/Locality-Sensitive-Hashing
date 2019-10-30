@@ -1,8 +1,8 @@
 import random
 import math
+import pickle
 from Shingle import Shingling
 
-random.seed(1)
 
 class MinHashH():
 
@@ -36,25 +36,44 @@ class MinHashH():
 
         return temp
 
-    def signature_matrix(self, dataset_size):
+    def signature_matrix(self, dataset_size, shingles_list=[], train=True):
         # Initialize the signature matrix
         sm, temp = [], []
-        for i in range(self.num_shingles):
-            temp.append(i+1)
-        random.shuffle(temp)
-        temp = temp[:self.num_hashes+1]
-        print("temp: {}".format(temp))
+        flag = 1
+
+        try:
+            with open('hamming_shuffle', 'rb') as infile:
+                temp = pickle.load(infile)
+        except EnvironmentError:
+            flag = 0
+
+        if(flag == 0):
+            for i in range(self.num_shingles):
+                temp.append(i+1)
+            random.shuffle(temp)
+            temp = temp[:self.num_hashes+1]
+
+            try:
+                with open('hamming_shuffle', 'wb') as outfile:
+                    pickle.dump(temp, outfile)
+            except EnvironmentError:
+                pass
         sdm = []
         for i in range(self.num_shingles):
             t = []
             for j in range(dataset_size):
                 t.append(0)
             sdm.append(t)
-
-        for row in self.shingle_dict.keys():
-            for col in self.shingle_dict[row]:
-                sdm[self.shingle_id_dict[row]-1][col-1] = 1
+        if train:
+            for row in self.shingle_dict.keys():
+                for col in self.shingle_dict[row]:
+                    sdm[self.shingle_id_dict[row]-1][col-1] = 1
+        else:
+            for row in self.shingle_dict.keys():
+                if row in shingles_list:
+                    sdm[self.shingle_id_dict[row]-1][0] = 1
 
         for i in range(self.num_hashes):
             sm.append(sdm[temp[i]])
+
         return sm
